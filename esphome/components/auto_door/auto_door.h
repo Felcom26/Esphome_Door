@@ -1,10 +1,12 @@
 #pragma once
 #include <ESP32Servo.h>
+#include <driver/ledc.h>
 //#include "ESP32Servo.h"
 //#include "analogWrite.h"
 #include "esphome/core/component.h"
 #include "esphome/core/time.h"
 #include "esphome/core/gpio.h"
+#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
 namespace auto_door {
