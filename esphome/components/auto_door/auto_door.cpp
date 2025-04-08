@@ -300,15 +300,15 @@ void AUTODOORComponent::fechar() {
 
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
-  ESP_LOGI(TAG, "CMD_Abrir");
+  ESP_LOGI(TAG, "CMD_M1");
   // ledcWrite(chan_drive_pin_, stop_vel_dm);
   digitalWrite(drive_pin_, 1);
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
-  ESP_LOGI(TAG, "CMD_Fechar");
+  ESP_LOGI(TAG, "CMD_M0");
   // ledcWrite(chan_drive_pin_, drive_vel_dm);
-  digitalWrite(drive_pin_, 1);
+  digitalWrite(drive_pin_, 0);
 }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
