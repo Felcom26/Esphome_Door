@@ -44,6 +44,10 @@ char serial;
 
 bool busy = false;
 
+const int pwmFreq = 1000;     // 1kHz
+const int pwmResolution = 8;  // 8 bits = valores de 0 a 255
+const int chan_drive_pin_ = 0;
+
 namespace esphome {
 namespace auto_door {
 
@@ -61,12 +65,12 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 
 void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
 
-void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
-void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
-
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
   // Serial.begin(9600);
+
+  ledcAttachPin(drive_pin_, chan_drive_pin_);
+  ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
 
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
@@ -78,7 +82,8 @@ void AUTODOORComponent::setup() {
   Engage.attach(engage_pin_);
   Engage.writeMicroseconds(stop_vel);
 
-  analogWrite(drive_pin_, stop_vel_dm);
+  ledcWrite(chan_drive_pin_, stop_vel_dm);
+  // analogWrite(drive_pin_, stop_vel_dm);
   digitalWrite(dir_pin_, 0);
 
   ES_off = digitalRead(esoff_pin_);
@@ -206,21 +211,24 @@ void AUTODOORComponent::abrir() {
   if (f_a == 1) {
     cmd = 'e';
     f_a = 2;
-    analogWrite(drive_pin_, engage_vel_dm);
+    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    // analogWrite(drive_pin_, engage_vel_dm);
     digitalWrite(dir_pin_, 1);
   }
 
   else if (f_a == 2 && Estado_EM == true) {
     f_a = 3;
-    analogWrite(drive_pin_, drive_vel_dm);
+    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 1);
     // Serial.println("abrindo");
   }
 
   else if (pos >= ang_open_ && f_a == 3) {
     f_a = 4;
-    analogWrite(drive_pin_, stop_vel_dm);
-    // Serial.println("aberto");
+    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    // analogWrite(drive_pin_, stop_vel_dm);
+    //  Serial.println("aberto");
   }
 
   else if (f_a == 4) {
@@ -234,21 +242,24 @@ void AUTODOORComponent::fechar() {
   if (f_f == 1) {
     cmd = 'e';
     f_f = 2;
-    analogWrite(drive_pin_, engage_vel_dm);
+    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    // analogWrite(drive_pin_, engage_vel_dm);
     digitalWrite(dir_pin_, 0);
   }
 
   else if (f_f == 2 && Estado_EM == true) {
     f_f = 3;
-    analogWrite(drive_pin_, drive_vel_dm);
+    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 0);
     // Serial.println("fechando");
   }
 
   else if (pos <= ang_close_ && f_f == 3) {
     f_f = 4;
-    analogWrite(drive_pin_, stop_vel_dm);
-    // Serial.println("fechado");
+    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    // analogWrite(drive_pin_, stop_vel_dm);
+    //  Serial.println("fechado");
   }
 
   else if (f_f == 4) {
@@ -258,6 +269,9 @@ void AUTODOORComponent::fechar() {
     busy = 0;
   }
 }
+
+void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
+void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
 
 }  // namespace auto_door
 }  // namespace esphome
