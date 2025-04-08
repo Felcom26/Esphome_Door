@@ -40,8 +40,6 @@ int pos;
 
 float tempo;
 
-char serial;
-
 bool busy = false;
 
 const int pwmFreq = 1000;     // 1kHz
@@ -137,26 +135,26 @@ void AUTODOORComponent::loop() {
   // Close_CMD = 0;
   // }
 
-  if ((cmd == 'e' || serial == 'e') && Estado_EM == false) {
+  if (cmd == 'e' && Estado_EM == false) {
     f_e = 1;
     cmd = 'n';
     // Serial.println("F_en");
   }
 
-  if ((cmd == 'd' || serial == 'd') && Estado_EM == true) {
+  if (cmd == 'd' && Estado_EM == true) {
     f_d = 1;
     cmd = 'n';
     // Serial.println("F_de");
   }
 
-  if ((cmd == 'a' || serial == 'a') && busy == false) {
+  if (cmd == 'a' && busy == false) {
     f_a = 1;
     cmd = 'n';
     busy = true;
     // Serial.println("F_ab");
   }
 
-  if ((cmd == 'f' || serial == 'f') && busy == false) {
+  if (cmd == 'f' && busy == false) {
     f_f = 1;
     cmd = 'n';
     busy = true;
