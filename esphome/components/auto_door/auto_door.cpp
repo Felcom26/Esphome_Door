@@ -94,6 +94,7 @@ void AUTODOORComponent::setup() {
 
   Engage.attach(engage_pin_);
   Engage.writeMicroseconds(stop_vel);
+  delay(1000);
 
   ledcWrite(chan_drive_pin_, stop_vel_dm);
   // analogWrite(drive_pin_, stop_vel_dm);
@@ -300,10 +301,12 @@ void AUTODOORComponent::fechar() {
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
   ESP_LOGI(TAG, "CMD_Abrir");
+  ledcWrite(chan_drive_pin_, stop_vel_dm);
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
   ESP_LOGI(TAG, "CMD_Fechar");
+  ledcWrite(chan_drive_pin_, drive_vel_dm);
 }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
