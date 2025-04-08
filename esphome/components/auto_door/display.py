@@ -2,7 +2,6 @@ import esphome.codegen as cg
 from esphome.components import display
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_LAMBDA
-from esphome.pins import gpio_pin_schema
 
 auto_door_ns = cg.esphome_ns.namespace("auto_door")
 AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.PollingComponent)
@@ -21,13 +20,13 @@ CONF_ANG_CLOSE = "ang_close"
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(AUTODOORComponent),
-        cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
-        cv.Required(CONF_DIR_PIN): gpio_pin_schema,
-        cv.Required(CONF_ROT_SENSOR_PIN): gpio_pin_schema,
-        cv.Required(CONF_ENGAGE_MOTOR_PIN): gpio_pin_schema,
-        cv.Required(CONF_POT_PIN): gpio_pin_schema,
-        cv.Required(CONF_ES_OFF_PIN): gpio_pin_schema,
-        cv.Required(CONF_ES_ON_PIN): gpio_pin_schema,
+        cv.Required(CONF_DRIVE_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_DIR_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_ROT_SENSOR_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_ENGAGE_MOTOR_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_POT_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_ES_OFF_PIN): cv.templatable(cv.string),
+        cv.Required(CONF_ES_ON_PIN): cv.templatable(cv.string),
         cv.Optional(CONF_ANG_OPEN, default=238): cv.int_range(min=0, max=270),
         cv.Optional(CONF_ANG_CLOSE, default=118): cv.int_range(min=0, max=270),
         cv.Optional(CONF_LAMBDA): cv.lambda_,
