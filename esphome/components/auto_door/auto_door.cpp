@@ -169,13 +169,13 @@ void AUTODOORComponent::loop() {
   // }
 }
 
-void AUTODOORComponent::display() {}
+// void AUTODOORComponent::display() {}
 
-void AUTODOORComponent::update() {
-  if (this->writer_.has_value())
-    (*this->writer_)(*this);
-  this->display();
-}
+// void AUTODOORComponent::update() {
+//   if (this->writer_.has_value())
+//     (*this->writer_)(*this);
+//   this->display();
+// }
 
 void AUTODOORComponent::engate() {
   if (ES_on == false && f_e == 1) {
@@ -269,6 +269,9 @@ void AUTODOORComponent::fechar() {
     busy = 0;
   }
 }
+
+void AUTODOORComponent::CMD_abrir() { cmd = 'a'; }
+void AUTODOORComponent::CMD_fechar() { cmd = 'f'; }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
 void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }

@@ -1,5 +1,4 @@
 import esphome.codegen as cg
-from esphome.components import display
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_LAMBDA
 
@@ -17,7 +16,7 @@ AUTODOORComponentRef = AUTODOORComponent.operator("ref")
 CONF_ANG_OPEN = "ang_open"
 CONF_ANG_CLOSE = "ang_close"
 
-CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend(
+CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(AUTODOORComponent),
         # cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
@@ -35,7 +34,7 @@ CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    await display.register_display(var, config)
+    # await display.register_display(var, config)
 
     # drive_pin = await cg.gpio_pin_expression(config[CONF_DRIVE_PIN])
     # cg.add(var.set_drive_pin(drive_pin))
