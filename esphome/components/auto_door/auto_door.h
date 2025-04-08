@@ -1,5 +1,6 @@
 #pragma once
-#include "ESP32Servo.h"
+#include <ESP32Servo.h>
+//#include "ESP32Servo.h"
 #include "analogWrite.h"
 #include "esphome/core/component.h"
 #include "esphome/core/time.h"
@@ -60,6 +61,9 @@ class AUTODOORComponent : public PollingComponent {
 #define pot_pin_ 35
 #define esoff_pin_ 16
 #define eson_pin_ 17
+
+  uint8_t ang_open_{0};
+  uint8_t ang_close_{0};
 
   optional<auto_door_writer_t> writer_{};
 };
