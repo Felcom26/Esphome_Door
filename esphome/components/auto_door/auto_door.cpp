@@ -179,6 +179,11 @@ void AUTODOORComponent::loop() {
     //   Serial.print(Estado_EM);
     //   Serial.print("  Estado_DM:  ");
     //   Serial.println(Estado_DM);
+    ESP_LOGD(TAG, "Estado_EM: %b", Estado_EM);
+    ESP_LOGD(TAG, "Estado_EM: %s", Estado_DM);
+    ESP_LOGD(TAG, "Posição do sensor: %u", pos);
+    ESP_LOGD(TAG, "ES_on: %b", ES_on);
+    ESP_LOGD(TAG, "ES_off: %b", ES_off);
     if (this->position_sensor_ != nullptr) {
       this->position_sensor_->publish_state(pos);
     }
