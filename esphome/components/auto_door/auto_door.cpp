@@ -168,22 +168,21 @@ void AUTODOORComponent::loop() {
   abrir();
   fechar();
 
-  // if((millis() - tempo)>2000){
-  //   Serial.print("POT:  ");
-  //   Serial.print(pos);
-  //   Serial.print("  ES_en:  ");
-  //   Serial.print(ES_on);
-  //   Serial.print("  ES_de:  ");
-  //   Serial.print(ES_off);
-  //   Serial.print("    Estado_EM:  ");
-  //   Serial.print(Estado_EM);
-  //   Serial.print("  Estado_DM:  ");
-  //   Serial.println(Estado_DM);
-  //
-  //   tempo = millis();
-  // }
-  if (this->position_sensor_ != nullptr) {
-    this->position_sensor_->publish_state(pos);
+  if ((millis() - tempo) > 1000) {
+    //   Serial.print("POT:  ");
+    //   Serial.print(pos);
+    //   Serial.print("  ES_en:  ");
+    //   Serial.print(ES_on);
+    //   Serial.print("  ES_de:  ");
+    //   Serial.print(ES_off);
+    //   Serial.print("    Estado_EM:  ");
+    //   Serial.print(Estado_EM);
+    //   Serial.print("  Estado_DM:  ");
+    //   Serial.println(Estado_DM);
+    if (this->position_sensor_ != nullptr) {
+      this->position_sensor_->publish_state(pos);
+    }
+    tempo = millis();
   }
 }
 
