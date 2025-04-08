@@ -51,7 +51,7 @@ const int chan_drive_pin_ = 0;
 namespace esphome {
 namespace auto_door {
 
-static const char *const TAG = "auto_dooor";
+static const char *const TAG = "auto_door";
 
 float AUTODOORComponent::get_setup_priority() const { return setup_priority::PROCESSOR; }
 
@@ -63,7 +63,12 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 // void AUTODOORComponent::set_esoff_pin(GPIOPin *esoff_pin) {this->esoff_pin_ = esoff_pin; }
 // void AUTODOORComponent::set_eson_pin(GPIOPin *eson_pin) {this->eson_pin_ = eson_pin; }
 
-void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
+// void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
+// void AUTODOORComponent::set_writer(Trigger<AUTODOORComponent *> *t) {
+//   this->writer_ = t;
+// }
+
+void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
@@ -174,8 +179,12 @@ void AUTODOORComponent::loop() {
 // void AUTODOORComponent::update() {
 //   if (this->writer_.has_value())
 //     (*this->writer_)(*this);
-//   this->display();
 // }
+
+void AUTODOORComponent::update() {
+  if (writer_)
+    writer_();
+}
 
 void AUTODOORComponent::engate() {
   if (ES_on == false && f_e == 1) {
