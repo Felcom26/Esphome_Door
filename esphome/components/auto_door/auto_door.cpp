@@ -182,7 +182,7 @@ void AUTODOORComponent::loop() {
     ESP_LOGD(TAG, "ES_on: %b", ES_on);
     ESP_LOGD(TAG, "ES_off: %b", ES_off);
     if (this->position_sensor_ != nullptr) {
-      this->position_sensor_->publish_state((pos - ang_close_));
+      this->position_sensor_->publish_state((pos - 118));
     }
     tempo = millis();
   }
