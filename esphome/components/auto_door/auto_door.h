@@ -6,6 +6,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/time.h"
 #include "esphome/core/gpio.h"
+#include "esphome/core/automation.h"
 //#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
@@ -15,7 +16,7 @@ class AUTODOORComponent;
 
 using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
 
-class AUTODOORComponent : public PollingComponent {
+class AUTODOORComponent : public Component {
  public:
   void set_writer(auto_door_writer_t &&writer);
 
@@ -29,12 +30,17 @@ class AUTODOORComponent : public PollingComponent {
 
   float get_setup_priority() const override;
 
-  void display();
+  // void display();
 
   void engate();
   void desengate();
   void abrir();
   void fechar();
+
+  void CMD_abrir();
+  void CMD_fechar();
+
+  Trigger<AUTODOORComponent *> *get_writer_trigger() { return &this->writer_; }
 
   // void set_drive_pin(GPIOPin *drive_pin);
   // void set_dir_pin(GPIOPin *dir_pin);
@@ -67,7 +73,8 @@ class AUTODOORComponent : public PollingComponent {
   uint8_t ang_open_{0};
   uint8_t ang_close_{0};
 
-  optional<auto_door_writer_t> writer_{};
+  // optional<auto_door_writer_t> writer_{};
+  Trigger<AUTODOORComponent *> writer_;
 };
 
 }  // namespace auto_door
