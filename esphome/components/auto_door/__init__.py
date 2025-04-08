@@ -45,7 +45,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_WRITER): cv.lambda_,
         # cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
     }
-).extend(cv.COMPONENT_SCHEMA)
+).extend(cv.polling_component_schema("50ms"))
 
 
 async def to_code(config):
