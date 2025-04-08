@@ -4,7 +4,7 @@ import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
 
 auto_door_ns = cg.esphome_ns.namespace("auto_door")
-AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.Component)
+AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.PollingComponent)
 AUTODOORComponentRef = AUTODOORComponent.operator("ref")
 
 # CONF_DRIVE_PIN = "drive_pin"
@@ -90,6 +90,11 @@ async def to_code(config):
             config[CONF_WRITER], [(AUTODOORComponentRef, "it")], return_type=cg.void
         )
         cg.add(var.set_writer(lambda_))
+
+    # if CONF_WRITER in config:
+    #    trigger = cg.new_Pvariable("writer_trigger", automation.Trigger.new())
+    #    await automation.build_automation(trigger, [], config[CONF_WRITER])
+    #    cg.add(var.set_writer(trigger))
 
     # if CONF_WRITER in config:
     #    await automation.build_automation(
