@@ -6,7 +6,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/time.h"
 #include "esphome/core/gpio.h"
-#include "esphome/components/template/switch/template_switch.h"
+//#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
 namespace auto_door {
