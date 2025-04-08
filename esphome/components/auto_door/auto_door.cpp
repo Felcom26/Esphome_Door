@@ -71,7 +71,7 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
 
 void AUTODOORComponent::update() {
-  ESP_LOGD(TAG, "Executando update() - verificando comando...");
+  // ESP_LOGD(TAG, "Executando update() - verificando comando...");
   if (writer_)
     writer_(*this);
 }
@@ -301,12 +301,14 @@ void AUTODOORComponent::fechar() {
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
   ESP_LOGI(TAG, "CMD_Abrir");
-  ledcWrite(chan_drive_pin_, stop_vel_dm);
+  // ledcWrite(chan_drive_pin_, stop_vel_dm);
+  digitalWrite(drive_pin_, 1);
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
   ESP_LOGI(TAG, "CMD_Fechar");
-  ledcWrite(chan_drive_pin_, drive_vel_dm);
+  // ledcWrite(chan_drive_pin_, drive_vel_dm);
+  digitalWrite(drive_pin_, 1);
 }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
