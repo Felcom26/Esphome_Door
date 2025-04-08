@@ -21,13 +21,13 @@ CONF_ANG_CLOSE = "ang_close"
 CONFIG_SCHEMA = display.BASIC_DISPLAY_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(AUTODOORComponent),
-        cv.Required(CONF_DRIVE_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_DIR_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_ROT_SENSOR_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_ENGAGE_MOTOR_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_POT_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_ES_OFF_PIN): cv.ensure_schema(gpio_pin_schema),
-        cv.Required(CONF_ES_ON_PIN): cv.ensure_schema(gpio_pin_schema),
+        cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
+        cv.Required(CONF_DIR_PIN): gpio_pin_schema,
+        cv.Required(CONF_ROT_SENSOR_PIN): gpio_pin_schema,
+        cv.Required(CONF_ENGAGE_MOTOR_PIN): gpio_pin_schema,
+        cv.Required(CONF_POT_PIN): gpio_pin_schema,
+        cv.Required(CONF_ES_OFF_PIN): gpio_pin_schema,
+        cv.Required(CONF_ES_ON_PIN): gpio_pin_schema,
         cv.Optional(CONF_ANG_OPEN, default=238): cv.int_range(min=0, max=270),
         cv.Optional(CONF_ANG_CLOSE, default=118): cv.int_range(min=0, max=270),
     }
