@@ -68,7 +68,13 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 //   this->writer_ = t;
 // }
 
+// void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
 void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
+
+void AUTODOORComponent::update() {
+  if (writer_)
+    writer_();
+}
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
@@ -180,11 +186,6 @@ void AUTODOORComponent::loop() {
 //   if (this->writer_.has_value())
 //     (*this->writer_)(*this);
 // }
-
-void AUTODOORComponent::update() {
-  if (writer_)
-    writer_();
-}
 
 void AUTODOORComponent::engate() {
   if (ES_on == false && f_e == 1) {
