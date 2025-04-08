@@ -199,12 +199,12 @@ void AUTODOORComponent::engate() {
     Engage.attach(engage_pin_);
     Engage.writeMicroseconds(stop_vel - max_vel);
     // Serial.println("engatando");
-    SP_LOGI(TAG, "engatando");
+    ESP_LOGI(TAG, "engatando");
   } else if (ES_on == true && f_e == 2) {
     f_e = 0;
     Engage.writeMicroseconds(stop_vel);
     Estado_EM = true;
-    SP_LOGI(TAG, "engatado");
+    ESP_LOGI(TAG, "engatado");
     // Serial.println("Estado EM :");
     // Serial.println(Estado_EM);
     // Engage.detach();
@@ -216,12 +216,12 @@ void AUTODOORComponent::desengate() {
     Engage.attach(engage_pin_);
     Engage.writeMicroseconds(stop_vel + max_vel);
     // Serial.println("desengatando");
-    SP_LOGI(TAG, "desengatando");
+    ESP_LOGI(TAG, "desengatando");
   } else if (ES_off == true && f_d == 2) {
     f_d = 0;
     Engage.writeMicroseconds(stop_vel);
     Estado_EM = false;
-    SP_LOGI(TAG, "desengatado");
+    ESP_LOGI(TAG, "desengatado");
     // Serial.println("Estado EM :");
     // Serial.println(Estado_EM);
     // Engage.detach();
@@ -242,7 +242,7 @@ void AUTODOORComponent::abrir() {
     // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 1);
     // Serial.println("abrindo");
-    SP_LOGI(TAG, "Abrindo");
+    ESP_LOGI(TAG, "Abrindo");
   }
 
   else if (pos >= ang_open_ && f_a == 3) {
@@ -250,7 +250,7 @@ void AUTODOORComponent::abrir() {
     ledcWrite(chan_drive_pin_, stop_vel_dm);
     // analogWrite(drive_pin_, stop_vel_dm);
     //  Serial.println("aberto");
-    SP_LOGI(TAG, "Aberto");
+    ESP_LOGI(TAG, "Aberto");
   }
 
   else if (f_a == 4) {
@@ -275,7 +275,7 @@ void AUTODOORComponent::fechar() {
     // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 0);
     // Serial.println("fechando");
-    SP_LOGI(TAG, "fechando");
+    ESP_LOGI(TAG, "fechando");
   }
 
   else if (pos <= ang_close_ && f_f == 3) {
@@ -283,7 +283,7 @@ void AUTODOORComponent::fechar() {
     ledcWrite(chan_drive_pin_, stop_vel_dm);
     // analogWrite(drive_pin_, stop_vel_dm);
     //  Serial.println("fechado");
-    SP_LOGI(TAG, "fechado");
+    ESP_LOGI(TAG, "fechado");
   }
 
   else if (f_f == 4) {
