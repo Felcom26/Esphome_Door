@@ -88,7 +88,7 @@ void AUTODOORComponent::setup() {
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
 
-  pinMode(drive_pin_, OUTPUT);
+  // pinMode(drive_pin_, OUTPUT);
   pinMode(dir_pin_, OUTPUT);
   pinMode(rotsen_pin_, INPUT);
 
@@ -300,15 +300,15 @@ void AUTODOORComponent::fechar() {
 
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
-  ESP_LOGI(TAG, "CMD_M1");
+  ESP_LOGI(TAG, "CMD_AB");
   // ledcWrite(chan_drive_pin_, stop_vel_dm);
-  digitalWrite(drive_pin_, 1);
+  // digitalWrite(drive_pin_, 1);
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
-  ESP_LOGI(TAG, "CMD_M0");
+  ESP_LOGI(TAG, "CMD_FE");
   // ledcWrite(chan_drive_pin_, drive_vel_dm);
-  digitalWrite(drive_pin_, 0);
+  // digitalWrite(drive_pin_, 0);
 }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
