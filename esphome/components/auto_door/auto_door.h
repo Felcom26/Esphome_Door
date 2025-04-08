@@ -12,19 +12,21 @@
 namespace esphome {
 namespace auto_door {
 
-class AUTODOORComponent;
+// class AUTODOORComponent;
 
-using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
+// using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
 
-class AUTODOORComponent : public Component {
+class AUTODOORComponent : public PollingComponent {
  public:
-  void set_writer(auto_door_writer_t &&writer);
+  // void set_writer(std::function<void()> &&writer);
+  // void set_writer(auto_door_writer_t &&writer);
+  void set_writer(std::function<void()> &&writer);
+
+  void update() override;
 
   void setup() override;
 
   void dump_config() override;
-
-  void update() override;
 
   void loop() override;
 
@@ -40,7 +42,7 @@ class AUTODOORComponent : public Component {
   void CMD_abrir();
   void CMD_fechar();
 
-  Trigger<AUTODOORComponent *> *get_writer_trigger() { return &this->writer_; }
+  // Trigger<AUTODOORComponent *> *get_writer_trigger() { return &this->writer_; }
 
   // void set_drive_pin(GPIOPin *drive_pin);
   // void set_dir_pin(GPIOPin *dir_pin);
@@ -54,6 +56,9 @@ class AUTODOORComponent : public Component {
   void set_ang_close(uint8_t ang_close);
 
  protected:
+  std::function<void()> writer_;
+  // std::function<void()> writer_;
+
   // GPIOPin *drive_pin_{nullptr};
   // GPIOPin *dir_pin_{nullptr};
   // GPIOPin *rotsen_pin_{nullptr};
@@ -70,11 +75,12 @@ class AUTODOORComponent : public Component {
 #define esoff_pin_ 16
 #define eson_pin_ 17
 
-  uint8_t ang_open_{0};
-  uint8_t ang_close_{0};
+  uint8_t ang_open_{238};
+  uint8_t ang_close_{118};
 
   // optional<auto_door_writer_t> writer_{};
-  Trigger<AUTODOORComponent *> writer_;
+  // Trigger<AUTODOORComponent *> writer_;
+  // Trigger<AUTODOORComponent *> *writer_{nullptr};
 };
 
 }  // namespace auto_door
