@@ -122,7 +122,7 @@ void AUTODOORComponent::loop() {
   // serial = Serial.read();
 
   pos = map(pot, 4096, 0, 0, 270);
-
+  int ha_pos = pos - 118;
   // if (Open_CMD == 1 && busy == 0){
   // cmd = 'a';
   // Open_CMD = 0;
@@ -182,7 +182,7 @@ void AUTODOORComponent::loop() {
     ESP_LOGD(TAG, "ES_on: %b", ES_on);
     ESP_LOGD(TAG, "ES_off: %b", ES_off);
     if (this->position_sensor_ != nullptr) {
-      this->position_sensor_->publish_state((pos - 118));
+      this->position_sensor_->publish_state(ha_pos);
     }
     tempo = millis();
   }
