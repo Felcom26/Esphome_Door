@@ -1,11 +1,11 @@
 from esphome import automation
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.const import CONF_ID, CONF_LAMBDA, CONF_UPDATE_INTERVAL
+from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
 
 auto_door_ns = cg.esphome_ns.namespace("auto_door")
-AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.PollingComponent)
-AUTODOORComponentRef = AUTODOORComponent.operator("ref")
+AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.Component)
+# AUTODOORComponentRef = AUTODOORComponent.operator("ref")
 
 # CONF_DRIVE_PIN = "drive_pin"
 # CONF_DIR_PIN = "dir_pin"
@@ -49,6 +49,9 @@ CONFIG_SCHEMA = cv.Schema(
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(var, config)
+
+    # var = cg.new_Pvariable(config[CONF_ID])
     # await display.register_display(var, config)
 
     # drive_pin = await cg.gpio_pin_expression(config[CONF_DRIVE_PIN])
@@ -75,8 +78,15 @@ async def to_code(config):
     cg.add(var.set_ang_open(config[CONF_ANG_OPEN]))
     cg.add(var.set_ang_close(config[CONF_ANG_CLOSE]))
 
-    if CONF_LAMBDA in config:
-        lambda_ = await cg.process_lambda(
-            config[CONF_LAMBDA], [(AUTODOORComponentRef, "it")], return_type=cg.void
+    # if CONF_LAMBDA in config:
+    #    lambda_ = await cg.process_lambda(
+    #        config[CONF_LAMBDA], [(AUTODOORComponentRef, "it")], return_type=cg.void
+    #    )
+    #    cg.add(var.set_writer(lambda_))
+
+    if CONF_WRITER in config:
+        await automation.build_automation(
+            var,
+            [(AUTODOORComponent, var)],
+            config[CONF_WRITER],
         )
-        cg.add(var.set_writer(lambda_))
