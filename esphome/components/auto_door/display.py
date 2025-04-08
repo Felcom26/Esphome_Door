@@ -1,6 +1,7 @@
+from esphome import automation
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.const import CONF_ID, CONF_LAMBDA
+from esphome.const import CONF_ID, CONF_LAMBDA, CONF_UPDATE_INTERVAL
 
 auto_door_ns = cg.esphome_ns.namespace("auto_door")
 AUTODOORComponent = auto_door_ns.class_("AUTODOORComponent", cg.PollingComponent)
@@ -15,9 +16,12 @@ AUTODOORComponentRef = AUTODOORComponent.operator("ref")
 # CONF_ES_ON_PIN = "eson_pin"
 CONF_ANG_OPEN = "ang_open"
 CONF_ANG_CLOSE = "ang_close"
+CONF_WRITER = "writer"
 
 CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
     {
+        cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.update_interval,
+        cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
         cv.GenerateID(): cv.declare_id(AUTODOORComponent),
         # cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
         # cv.Required(CONF_DIR_PIN): gpio_pin_schema,
