@@ -286,8 +286,14 @@ void AUTODOORComponent::fechar() {
   }
 }
 
-void AUTODOORComponent::CMD_abrir() { cmd = 'a'; }
-void AUTODOORComponent::CMD_fechar() { cmd = 'f'; }
+void AUTODOORComponent::CMD_abrir() {
+  cmd = 'a';
+  ESP_LOGI(TAG, "Abrindo");
+}
+void AUTODOORComponent::CMD_fechar() {
+  cmd = 'f';
+  ESP_LOGI(TAG, "Fechando");
+}
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
 void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
