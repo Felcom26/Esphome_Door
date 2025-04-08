@@ -20,7 +20,10 @@ class AUTODOORComponent : public PollingComponent {
  public:
   // void set_writer(std::function<void()> &&writer);
   // void set_writer(auto_door_writer_t &&writer);
-  void set_writer(std::function<void()> &&writer);
+  // void set_writer(std::function<void()> &&writer);
+
+  using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
+  void set_writer(auto_door_writer_t &&writer);
 
   void update() override;
 
@@ -56,7 +59,8 @@ class AUTODOORComponent : public PollingComponent {
   void set_ang_close(uint8_t ang_close);
 
  protected:
-  std::function<void()> writer_;
+  // std::function<void()> writer_;
+  auto_door_writer_t writer_;
   // std::function<void()> writer_;
 
   // GPIOPin *drive_pin_{nullptr};
