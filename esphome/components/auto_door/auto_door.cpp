@@ -298,11 +298,11 @@ void AUTODOORComponent::fechar() {
 
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
-  ESP_LOGI(TAG, "CMD_A");
+  ESP_LOGI(TAG, "CMD_Abrir");
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
-  ESP_LOGI(TAG, "CMD_F");
+  ESP_LOGI(TAG, "CMD_Fechar");
 }
 
 void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
