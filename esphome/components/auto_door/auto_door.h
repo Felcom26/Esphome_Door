@@ -7,6 +7,7 @@
 #include "esphome/core/time.h"
 #include "esphome/core/gpio.h"
 #include "esphome/core/automation.h"
+#include "esphome/components/sensor/sensor.h"
 //#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
@@ -21,6 +22,7 @@ class AUTODOORComponent : public PollingComponent {
   // void set_writer(std::function<void()> &&writer);
   // void set_writer(auto_door_writer_t &&writer);
   // void set_writer(std::function<void()> &&writer);
+  void set_position_sensor(sensor::Sensor *sensor);
 
   using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
   void set_writer(auto_door_writer_t &&writer);
@@ -62,7 +64,7 @@ class AUTODOORComponent : public PollingComponent {
   // std::function<void()> writer_;
   auto_door_writer_t writer_;
   // std::function<void()> writer_;
-
+  sensor::Sensor *position_sensor_{nullptr};
   // GPIOPin *drive_pin_{nullptr};
   // GPIOPin *dir_pin_{nullptr};
   // GPIOPin *rotsen_pin_{nullptr};

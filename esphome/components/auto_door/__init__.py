@@ -18,6 +18,9 @@ CONF_ANG_OPEN = "ang_open"
 CONF_ANG_CLOSE = "ang_close"
 CONF_WRITER = "writer"
 
+CONF_POSITION_SENSOR = "position_sensor"
+sensor = cg.global_ns.namespace("esphome").namespace("sensor").class_("Sensor")
+
 # CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
 #    {
 #        cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.update_interval,
@@ -43,6 +46,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_ANG_CLOSE): cv.int_,
         cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval,
         cv.Optional(CONF_WRITER): cv.lambda_,
+        cv.Optional(CONF_POSITION_SENSOR): cv.use_id(sensor),
         # cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
     }
 ).extend(cv.polling_component_schema("50ms"))
@@ -84,6 +88,9 @@ async def to_code(config):
     #        config[CONF_LAMBDA], [(AUTODOORComponentRef, "it")], return_type=cg.void
     #    )
     #    cg.add(var.set_writer(lambda_))
+    if CONF_POSITION_SENSOR in config:
+        sens = await cg.get_variable(config[CONF_POSITION_SENSOR])
+        cg.add(var.set_position_sensor(sens))
 
     if CONF_WRITER in config:
         lambda_ = await cg.process_lambda(

@@ -77,6 +77,8 @@ void AUTODOORComponent::update() {
     writer_(*this);
 }
 
+void AUTODOORComponent::set_position_sensor(sensor::Sensor *sensor) { this->position_sensor_ = sensor; }
+
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
   // Serial.begin(9600);
@@ -179,6 +181,9 @@ void AUTODOORComponent::loop() {
   //
   //   tempo = millis();
   // }
+  if (this->position_sensor_ != nullptr) {
+    this->position_sensor_->publish_state(pos);
+  }
 }
 
 // void AUTODOORComponent::display() {}
