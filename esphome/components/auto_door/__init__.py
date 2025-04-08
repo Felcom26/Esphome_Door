@@ -1,7 +1,6 @@
 # from esphome import automation
 import esphome.codegen as cg
-
-# from esphome.components import sensor
+from esphome.components import sensor
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
 
@@ -21,7 +20,8 @@ CONF_ANG_CLOSE = "ang_close"
 CONF_WRITER = "writer"
 
 CONF_POSITION_SENSOR = "position_sensor"
-sensor = cg.global_ns.namespace("esphome").namespace("sensor").class_("Sensor")
+# sensor = cg.global_ns.namespace("esphome").namespace("sensor").class_("Sensor")
+Sensor = sensor.sensor_ns.class_("Sensor", cg.Component)
 
 # CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
 #    {
@@ -48,7 +48,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_ANG_CLOSE): cv.int_,
         cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval,
         cv.Optional(CONF_WRITER): cv.lambda_,
-        cv.Optional(CONF_POSITION_SENSOR): cv.use_id(sensor),
+        cv.Optional(CONF_POSITION_SENSOR): cv.use_id(Sensor),
         # cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
     }
 ).extend(cv.polling_component_schema("50ms"))

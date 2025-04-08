@@ -73,6 +73,7 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
 
 void AUTODOORComponent::update() {
+  ESP_LOGD(TAG, "Executando update() - verificando comando...");
   if (writer_)
     writer_(*this);
 }
