@@ -18,22 +18,33 @@ CONF_ANG_OPEN = "ang_open"
 CONF_ANG_CLOSE = "ang_close"
 CONF_WRITER = "writer"
 
-CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
+# CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
+#    {
+#        cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.update_interval,
+#        cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
+#        cv.GenerateID(): cv.declare_id(AUTODOORComponent),
+#        # cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_DIR_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_ROT_SENSOR_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_ENGAGE_MOTOR_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_POT_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_ES_OFF_PIN): gpio_pin_schema,
+#        # cv.Required(CONF_ES_ON_PIN): gpio_pin_schema,
+#        cv.Optional(CONF_ANG_OPEN, default=238): cv.int_,
+#        cv.Optional(CONF_ANG_CLOSE, default=118): cv.int_,
+#    }
+# ).extend(cv.polling_component_schema("50ms"))
+
+
+CONFIG_SCHEMA = cv.Schema(
     {
-        cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.update_interval,
-        cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
         cv.GenerateID(): cv.declare_id(AUTODOORComponent),
-        # cv.Required(CONF_DRIVE_PIN): gpio_pin_schema,
-        # cv.Required(CONF_DIR_PIN): gpio_pin_schema,
-        # cv.Required(CONF_ROT_SENSOR_PIN): gpio_pin_schema,
-        # cv.Required(CONF_ENGAGE_MOTOR_PIN): gpio_pin_schema,
-        # cv.Required(CONF_POT_PIN): gpio_pin_schema,
-        # cv.Required(CONF_ES_OFF_PIN): gpio_pin_schema,
-        # cv.Required(CONF_ES_ON_PIN): gpio_pin_schema,
-        cv.Optional(CONF_ANG_OPEN, default=238): cv.int_,
-        cv.Optional(CONF_ANG_CLOSE, default=118): cv.int_,
+        cv.Required(CONF_ANG_OPEN): cv.int_,
+        cv.Required(CONF_ANG_CLOSE): cv.int_,
+        cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval,
+        cv.Optional(CONF_WRITER): automation.validate_automation(single=True),
     }
-).extend(cv.polling_component_schema("50ms"))
+).extend(cv.COMPONENT_SCHEMA)
 
 
 async def to_code(config):
