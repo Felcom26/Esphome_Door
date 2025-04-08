@@ -168,7 +168,7 @@ void AUTODOORComponent::loop() {
   abrir();
   fechar();
 
-  if ((millis() - tempo) > 1000) {
+  if ((millis() - tempo) > 2000) {
     //   Serial.print("POT:  ");
     //   Serial.print(pos);
     //   Serial.print("  ES_en:  ");
@@ -180,7 +180,6 @@ void AUTODOORComponent::loop() {
     //   Serial.print("  Estado_DM:  ");
     //   Serial.println(Estado_DM);
     ESP_LOGD(TAG, "Estado_EM: %b", Estado_EM);
-    ESP_LOGD(TAG, "Estado_EM: %s", Estado_DM);
     ESP_LOGD(TAG, "Posição do sensor: %u", pos);
     ESP_LOGD(TAG, "ES_on: %b", ES_on);
     ESP_LOGD(TAG, "ES_off: %b", ES_off);
