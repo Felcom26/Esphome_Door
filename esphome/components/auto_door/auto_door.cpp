@@ -278,5 +278,10 @@ void AUTODOORComponent::CMD_fechar() {
   // ledcWrite(chan_drive_pin_, drive_vel_dm);
 }
 
+void AUTODOORComponent::set_speed(float speed) {
+  // Aqui você implementa o controle do motor como quiser
+  ESP_LOGD("SPEED", "Velocidade recebida: %.1f", speed);
+}
+
 }  // namespace auto_door
 }  // namespace esphome
