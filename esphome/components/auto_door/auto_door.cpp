@@ -37,6 +37,7 @@ int engage_vel_dm = stop_vel_dm - set_engage_vel;
 
 int pot;
 int pos;
+int ha_pos;
 
 float tempo;
 
@@ -126,7 +127,7 @@ void AUTODOORComponent::loop() {
   ES_on = digitalRead(eson_pin_);
 
   pos = map(pot, 4096, 0, 0, 270);
-  int ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
+  ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
 
   if (cmd == 'e' && Estado_EM == false) {
     f_e = 1;
