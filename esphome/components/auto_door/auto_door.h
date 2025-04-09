@@ -1,7 +1,6 @@
 #pragma once
 #include <ESP32Servo.h>
 #include <driver/ledc.h>
-//#include "ESP32Servo.h"
 //#include "analogWrite.h"
 #include "esphome/core/component.h"
 #include "esphome/core/time.h"
@@ -14,8 +13,6 @@ namespace esphome {
 namespace auto_door {
 
 // class AUTODOORComponent;
-
-// using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
 
 class AUTODOORComponent : public PollingComponent {
  public:
@@ -37,12 +34,12 @@ class AUTODOORComponent : public PollingComponent {
 
   float get_setup_priority() const override;
 
-  // void display();
-
   void engate();
   void desengate();
   void abrir();
   void fechar();
+
+  void DEBUG_prints();
 
   void CMD_abrir();
   void CMD_fechar();
@@ -63,7 +60,6 @@ class AUTODOORComponent : public PollingComponent {
  protected:
   // std::function<void()> writer_;
   auto_door_writer_t writer_;
-  // std::function<void()> writer_;
   sensor::Sensor *position_sensor_{nullptr};
   // GPIOPin *drive_pin_{nullptr};
   // GPIOPin *dir_pin_{nullptr};

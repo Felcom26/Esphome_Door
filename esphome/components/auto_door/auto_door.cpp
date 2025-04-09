@@ -67,7 +67,6 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 // }
 
 // void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
-// void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
 void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
 
 void AUTODOORComponent::update() {
@@ -76,31 +75,35 @@ void AUTODOORComponent::update() {
     writer_(*this);
 }
 
+void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
+void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
+
 void AUTODOORComponent::set_position_sensor(sensor::Sensor *sensor) { this->position_sensor_ = sensor; }
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
-  // Serial.begin(9600);
 
-  // ledcAttachPin(drive_pin_, chan_drive_pin_);
-  // ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
-
+  // Pinos de EndStop
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
 
+  // Pinos Drive Motor
   pinMode(drive_pin_, OUTPUT);
   pinMode(dir_pin_, OUTPUT);
   pinMode(rotsen_pin_, INPUT);
 
+  // Inicia Motores
+  ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
+  ledcAttachPin(drive_pin_, chan_drive_pin_);
   Engage.attach(engage_pin_);
+
+  // Desliga Motores
   Engage.writeMicroseconds(stop_vel);
+  ledcWrite(chan_drive_pin_, stop_vel_dm);
+  digitalWrite(dir_pin_, 0);
   delay(1000);
 
-  // ledcWrite(chan_drive_pin_, stop_vel_dm);
-  digitalWrite(drive_pin_, 1);
-  // analogWrite(drive_pin_, stop_vel_dm);
-  digitalWrite(dir_pin_, 0);
-
+  // Desengata motor para iniciar
   ES_off = digitalRead(esoff_pin_);
   if (ES_off == false)
     cmd = 'd';
@@ -121,46 +124,30 @@ void AUTODOORComponent::loop() {
   pot = analogRead(pot_pin_);
   ES_off = digitalRead(esoff_pin_);
   ES_on = digitalRead(eson_pin_);
-  // serial = Serial.read();
 
   pos = map(pot, 4096, 0, 0, 270);
-  int ha_pos = pos - 118;
-  // if (Open_CMD == 1 && busy == 0){
-  // cmd = 'a';
-  // Open_CMD = 0;
-  // busy = 1;
-  // }
-
-  // if (Close_CMD == 1 && busy == 0){
-  //  busy = 1;
-  // cmd = 'f';
-  // Close_CMD = 0;
-  // }
+  int ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
 
   if (cmd == 'e' && Estado_EM == false) {
     f_e = 1;
     cmd = 'n';
-    // Serial.println("F_en");
   }
 
   if (cmd == 'd' && Estado_EM == true) {
     f_d = 1;
     cmd = 'n';
-    // Serial.println("F_de");
   }
 
   if (cmd == 'a' && busy == false) {
     f_a = 1;
     cmd = 'n';
     busy = true;
-    // Serial.println("F_ab");
   }
 
   if (cmd == 'f' && busy == false) {
     f_f = 1;
     cmd = 'n';
     busy = true;
-    // Serial.println("F_fe");
   }
 
   engate();
@@ -169,53 +156,37 @@ void AUTODOORComponent::loop() {
   fechar();
 
   if ((millis() - tempo) > 1000) {
-    //   Serial.print("POT:  ");
-    //   Serial.print(pos);
-    //   Serial.print("  ES_en:  ");
-    //   Serial.print(ES_on);
-    //   Serial.print("  ES_de:  ");
-    //   Serial.print(ES_off);
-    //   Serial.print("    Estado_EM:  ");
-    //   Serial.print(Estado_EM);
-    //   Serial.print("  Estado_DM:  ");
-    //   Serial.println(Estado_DM);
-    ESP_LOGD(TAG, "Flag A: %d", f_a);
-    ESP_LOGD(TAG, "Flag F: %d", f_f);
-    ESP_LOGD(TAG, "Flag E: %d", f_e);
-    ESP_LOGD(TAG, "Flag D: %d", f_d);
-    // ESP_LOGD(TAG, "Estado_DM: %s", Estado_DM);
-    ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
-    ESP_LOGD(TAG, "Posição do sensor: %d", pos);
-    ESP_LOGD(TAG, "ES_on: %d", ES_on);
-    ESP_LOGD(TAG, "ES_off: %d", ES_off);
-    if (this->position_sensor_ != nullptr) {
-      this->position_sensor_->publish_state(ha_pos);
-    }
+    DEBUG_prints();
     tempo = millis();
   }
 }
 
-// void AUTODOORComponent::display() {}
-
-// void AUTODOORComponent::update() {
-//   if (this->writer_.has_value())
-//     (*this->writer_)(*this);
-// }
+void AUTODOORComponent::DEBUG_prints() {
+  ESP_LOGD(TAG, "Flag A: %d", f_a);
+  ESP_LOGD(TAG, "Flag F: %d", f_f);
+  ESP_LOGD(TAG, "Flag E: %d", f_e);
+  ESP_LOGD(TAG, "Flag D: %d", f_d);
+  // ESP_LOGD(TAG, "Estado_DM: %s", Estado_DM);
+  ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
+  ESP_LOGD(TAG, "Posição do sensor: %d", pos);
+  ESP_LOGD(TAG, "ES_on: %d", ES_on);
+  ESP_LOGD(TAG, "ES_off: %d", ES_off);
+  if (this->position_sensor_ != nullptr) {
+    this->position_sensor_->publish_state(ha_pos);
+  }
+}
 
 void AUTODOORComponent::engate() {
   if (ES_on == false && f_e == 1) {
     f_e = 2;
     Engage.attach(engage_pin_);
     Engage.writeMicroseconds(stop_vel - max_vel);
-    // Serial.println("engatando");
     ESP_LOGI(TAG, "engatando");
   } else if (ES_on == true && f_e == 2) {
     f_e = 0;
     Engage.writeMicroseconds(stop_vel);
     Estado_EM = true;
     ESP_LOGI(TAG, "engatado");
-    // Serial.println("Estado EM :");
-    // Serial.println(Estado_EM);
     // Engage.detach();
   }
 }
@@ -224,15 +195,12 @@ void AUTODOORComponent::desengate() {
     f_d = 2;
     Engage.attach(engage_pin_);
     Engage.writeMicroseconds(stop_vel + max_vel);
-    // Serial.println("desengatando");
     ESP_LOGI(TAG, "desengatando");
   } else if (ES_off == true && f_d == 2) {
     f_d = 0;
     Engage.writeMicroseconds(stop_vel);
     Estado_EM = false;
     ESP_LOGI(TAG, "desengatado");
-    // Serial.println("Estado EM :");
-    // Serial.println(Estado_EM);
     // Engage.detach();
   }
 }
@@ -240,26 +208,23 @@ void AUTODOORComponent::abrir() {
   if (f_a == 1) {
     cmd = 'e';
     f_a = 2;
-    // ledcWrite(chan_drive_pin_, engage_vel_dm);
-    digitalWrite(drive_pin_, 0);
-    // analogWrite(drive_pin_, engage_vel_dm);
+    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 1);
   }
 
   else if (f_a == 2 && Estado_EM == true) {
     f_a = 3;
-    // ledcWrite(chan_drive_pin_, drive_vel_dm);
-    digitalWrite(drive_pin_, 0);
-    // analogWrite(drive_pin_, drive_vel_dm);
+    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 1);
     ESP_LOGI(TAG, "Abrindo");
   }
 
   else if (pos >= ang_open_ && f_a == 3) {
     f_a = 4;
-    // ledcWrite(chan_drive_pin_, stop_vel_dm);
-    digitalWrite(drive_pin_, 1);
-    // analogWrite(drive_pin_, stop_vel_dm);
+    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    // digitalWrite(drive_pin_, 1);
     ESP_LOGI(TAG, "Aberto");
   }
 
@@ -274,26 +239,23 @@ void AUTODOORComponent::fechar() {
   if (f_f == 1) {
     cmd = 'e';
     f_f = 2;
-    // ledcWrite(chan_drive_pin_, engage_vel_dm);
-    digitalWrite(drive_pin_, 0);
-    // analogWrite(drive_pin_, engage_vel_dm);
+    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 0);
   }
 
   else if (f_f == 2 && Estado_EM == true) {
     f_f = 3;
-    // ledcWrite(chan_drive_pin_, drive_vel_dm);
-    digitalWrite(drive_pin_, 0);
-    // analogWrite(drive_pin_, drive_vel_dm);
+    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 0);
     ESP_LOGI(TAG, "fechando");
   }
 
   else if (pos <= ang_close_ && f_f == 3) {
     f_f = 4;
-    // ledcWrite(chan_drive_pin_, stop_vel_dm);
-    digitalWrite(drive_pin_, 1);
-    // analogWrite(drive_pin_, stop_vel_dm);
+    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    // digitalWrite(drive_pin_, 1);
     ESP_LOGI(TAG, "fechado");
   }
 
@@ -307,19 +269,14 @@ void AUTODOORComponent::fechar() {
 
 void AUTODOORComponent::CMD_abrir() {
   cmd = 'a';
-  ESP_LOGI(TAG, "CMD_AB");
+  ESP_LOGI(TAG, "CMD_ABRIR");
   // ledcWrite(chan_drive_pin_, stop_vel_dm);
-  // digitalWrite(drive_pin_, 1);
 }
 void AUTODOORComponent::CMD_fechar() {
   cmd = 'f';
-  ESP_LOGI(TAG, "CMD_FE");
+  ESP_LOGI(TAG, "CMD_FECHAR");
   // ledcWrite(chan_drive_pin_, drive_vel_dm);
-  // digitalWrite(drive_pin_, 0);
 }
-
-void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_open; }
-void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
 
 }  // namespace auto_door
 }  // namespace esphome
