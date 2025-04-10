@@ -38,6 +38,9 @@ int ha_pos;
 
 float tempo;
 
+bool debug_sw_ = false;
+bool div2 = false;
+
 const int pwmFreq = 1000;       // 1kHz
 const int pwmResolution = 8;    // 8 bits = valores de 0 a 255
 const int chan_drive_pin_ = 4;  // Não usar 0
@@ -186,7 +189,6 @@ void AUTODOORComponent::loop() {
 }
 
 void AUTODOORComponent::DEBUG_prints() {
-  bool div2 = false;
   if (div2 == true) {
     ESP_LOGD(TAG, "Flag A: %d", f_a);
     ESP_LOGD(TAG, "Flag F: %d", f_f);
@@ -315,10 +317,14 @@ void AUTODOORComponent::CMD_fechar() {
   // ledcWrite(chan_drive_pin_, drive_vel_dm);
 }
 
+void AUTODOORComponent::set_debug_mode(bool debug_sw) { debug_sw_ = debug_sw; }
+
 void AUTODOORComponent::set_speed(float speed) {
-  int pwm_speed = map(speed, 0, 100, 0, 255);
-  // ledcWrite(chan_drive_pin_, pwm_speed);
-  ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
+  if (debug_sw_ == true) {
+    int pwm_speed = map(speed, 0, 100, 0, 255);
+    ledcWrite(chan_drive_pin_, pwm_speed);
+    ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
+  }
 }
 
 }  // namespace auto_door

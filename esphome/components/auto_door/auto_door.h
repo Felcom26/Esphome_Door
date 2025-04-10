@@ -34,6 +34,7 @@ class AUTODOORComponent : public PollingComponent {
   float get_setup_priority() const override;
 
   void set_speed(float speed);
+  void set_debug_mode(bool debug_sw);
 
   void engate();
   void desengate();
