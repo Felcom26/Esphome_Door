@@ -179,23 +179,29 @@ void AUTODOORComponent::loop() {
   abrir();
   fechar();
 
-  if ((millis() - tempo) > 1000) {
+  if ((millis() - tempo) > 500) {
     DEBUG_prints();
     tempo = millis();
   }
 }
 
 void AUTODOORComponent::DEBUG_prints() {
-  ESP_LOGD(TAG, "Flag A: %d", f_a);
-  ESP_LOGD(TAG, "Flag F: %d", f_f);
-  ESP_LOGD(TAG, "Flag E: %d", f_e);
-  ESP_LOGD(TAG, "Flag D: %d", f_d);
-  ESP_LOGD(TAG, "Estado_DM: %c", Estado_DM);
-  ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
-  ESP_LOGD(TAG, "Posição do sensor: %d", pos);
-  ESP_LOGD(TAG, "ES_on: %d", ES_on);
-  ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V10 HA_RPM");
+  bool div2 = false;
+  if (div2 == true) {
+    ESP_LOGD(TAG, "Flag A: %d", f_a);
+    ESP_LOGD(TAG, "Flag F: %d", f_f);
+    ESP_LOGD(TAG, "Flag E: %d", f_e);
+    ESP_LOGD(TAG, "Flag D: %d", f_d);
+    ESP_LOGD(TAG, "Estado_DM: %c", Estado_DM);
+    ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
+    ESP_LOGD(TAG, "Posição do sensor: %d", pos);
+    ESP_LOGD(TAG, "ES_on: %d", ES_on);
+    ESP_LOGD(TAG, "ES_off: %d", ES_off);
+    ESP_LOGI(TAG, "V10 HA_RPM");
+    div2 = false;
+  } else {
+    div2 = true;
+  }
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
