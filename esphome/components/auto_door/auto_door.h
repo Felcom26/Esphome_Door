@@ -21,6 +21,7 @@ class AUTODOORComponent : public PollingComponent {
   void set_writer(auto_door_writer_t &&writer);
 
   void set_position_sensor(sensor::Sensor *sensor);
+  void set_rpm_sensor(sensor::Sensor *sensor);
 
   void update() override;
 
@@ -57,7 +58,9 @@ class AUTODOORComponent : public PollingComponent {
 
  protected:
   auto_door_writer_t writer_;
+
   sensor::Sensor *position_sensor_{nullptr};
+  sensor::Sensor *rpm_sensor_{nullptr};
   // GPIOPin *drive_pin_{nullptr};
   // GPIOPin *dir_pin_{nullptr};
   // GPIOPin *rotsen_pin_{nullptr};

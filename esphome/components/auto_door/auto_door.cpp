@@ -44,8 +44,8 @@ const int chan_drive_pin_ = 4;  // Não usar 0
 
 volatile uint32_t encoder_pulse_count = 0;
 unsigned long last_rpm_check = 0;
-float current_rpm = 0.0;
-const uint8_t PULSES_PER_ROTATION = 7;  // valor estimado, ajustar depois
+float rpm_ = 0.0;
+const uint8_t PULSES_PER_ROTATION = 1000;  // valor estimado, ajustar depois
 
 namespace esphome {
 namespace auto_door {
@@ -76,6 +76,7 @@ void AUTODOORComponent::set_ang_open(uint8_t ang_open) { this->ang_open_ = ang_o
 void AUTODOORComponent::set_ang_close(uint8_t ang_close) { this->ang_close_ = ang_close; }
 
 void AUTODOORComponent::set_position_sensor(sensor::Sensor *sensor) { this->position_sensor_ = sensor; }
+void AUTODOORComponent::set_rpm_sensor(sensor::Sensor *sensor) { this->rpm_sensor_ = sensor; }
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
@@ -112,8 +113,6 @@ void AUTODOORComponent::setup() {
   delay(500);
 }
 
-void IRAM_ATTR encoder_isr() { encoder_pulse_count++; }
-
 void AUTODOORComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "Auto Door V2:");
   ESP_LOGCONFIG(TAG, "  Angulo Aberto: %u", this->ang_open_);
@@ -129,10 +128,28 @@ void AUTODOORComponent::loop() {
   pos = map(pot, 4096, 0, 0, 270);
   ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
 
-  static uint32_t last_log_time = 0;
-  if (millis() - last_log_time > 1000) {  // a cada 1 segundo
-    ESP_LOGI("auto_door", "Pulsos totais: %u", encoder_pulse_count);
-    last_log_time = millis();
+  // static uint32_t last_log_time = 0;
+  // if (millis() - last_log_time > 1000) {  // a cada 1 segundo
+  //   ESP_LOGI("auto_door", "Pulsos totais: %u", encoder_pulse_count);
+  //   last_log_time = millis();
+  // }
+  // uint32_t pulses = encoder_pulse_count;
+  // encoder_pulse_count = 0;
+  // rpm_ = (pulses * 60.0f) / 1000.0f;  // 1000 = pulsos por rotação
+
+  static uint32_t last_time = 0;
+  uint32_t now = millis();
+  uint32_t elapsed_ms = now - last_time;
+  last_time = now;
+
+  uint32_t pulses = encoder_pulse_count;
+  encoder_pulse_count = 0;
+
+  // elapsed_ms em milissegundos → converter para minutos
+  float elapsed_minutes = elapsed_ms / 60000.0f;
+
+  if (elapsed_minutes > 0) {
+    rpm_ = (pulses / PULSES_PER_ROTATION) / elapsed_minutes;  // pulsos por rotação = 1000
   }
 
   if (cmd == 'e' && Estado_EM == false) {
@@ -182,7 +199,13 @@ void AUTODOORComponent::DEBUG_prints() {
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
+  ESP_LOGD(TAG, "RPM: %.2f", rpm_);
+  if (this->rpm_sensor_ != nullptr) {
+    this->rpm_sensor_->publish_state(rpm_);
+  }
 }
+
+void IRAM_ATTR encoder_isr() { encoder_pulse_count++; }
 
 void AUTODOORComponent::engate() {
   if (ES_on == false && f_e == 1) {

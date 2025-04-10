@@ -20,7 +20,9 @@ CONF_ANG_CLOSE = "ang_close"
 CONF_WRITER = "writer"
 
 CONF_POSITION_SENSOR = "position_sensor"
+CONF_RPM_SENSOR = "rpm_sensor"
 Sensor = sensor.sensor_ns.class_("Sensor", cg.Component)
+
 
 # CONFIG_SCHEMA = cv.COMPONENT_SCHEMA.extend(
 #    {
@@ -48,6 +50,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval,
         cv.Optional(CONF_WRITER): cv.lambda_,
         cv.Optional(CONF_POSITION_SENSOR): cv.use_id(Sensor),
+        cv.Optional(CONF_RPM_SENSOR): cv.use_id(Sensor),
     }
 ).extend(cv.polling_component_schema("50ms"))
 
@@ -86,6 +89,10 @@ async def to_code(config):
     if CONF_POSITION_SENSOR in config:
         sens = await cg.get_variable(config[CONF_POSITION_SENSOR])
         cg.add(var.set_position_sensor(sens))
+
+    if CONF_RPM_SENSOR in config:
+        sens = await cg.get_variable(config[CONF_RPM_SENSOR])
+        cg.add(var.set_rpm_sensor(sens))
 
     if CONF_WRITER in config:
         lambda_ = await cg.process_lambda(
