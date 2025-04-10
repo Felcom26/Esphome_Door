@@ -162,7 +162,7 @@ void AUTODOORComponent::loop() {
     uint32_t pulses = encoder_pulse_count;
     encoder_pulse_count = 0;
     rpm_ = (pulses / PULSES_PER_ROTATION) * 60;
-    tempo = millis();
+    tempo_rpm = millis();
   }
 
   if (cmd == 'e' && Estado_EM == false) {
