@@ -80,18 +80,19 @@ class AUTODOORComponent : public PollingComponent {
   uint8_t ang_open_{238};
   uint8_t ang_close_{118};
 
-  volatile int pulse_count = 0;
-  float rpm = 0.0;
-  unsigned long last_pulse_time = 0;
-  static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme seu encoder
+  volatile unsigned long last_pulse_time = 0;
+  volatile unsigned int pulse_count = 0;
+  volatile float rpm = 0.0;
+  static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme necessário
 
-  timer_group_t timer_group = TIMER_GROUP_0;
-  timer_idx_t timer_idx = TIMER_0;
-
-  static void IRAM_ATTR encoder_isr_handler(void *arg);
-  void handle_encoder_pulse();
-  static portMUX_TYPE timerMux;  // Para proteção das variáveis compartilhadas
+  // Timer
   hw_timer_t *timer = nullptr;
+  static void handle_encoder_pulse_wrapper(AUTODOORComponent *instance);
+  void handle_encoder_pulse();
+
+ private:
+  static void IRAM_ATTR encoder_isr_handler(void *arg);
+  static portMUX_TYPE timerMux;
 };
 
 }  // namespace auto_door

@@ -5,7 +5,6 @@
 //#include "esphome/core/component.h"
 //#include "esphome/core/time.h"
 // portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-portMUX_TYPE AUTODOORComponent::timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 Servo Engage;
 
@@ -49,6 +48,8 @@ namespace auto_door {
 
 static const char *const TAG = "auto_door";
 
+portMUX_TYPE AUTODOORComponent::timerMux = portMUX_INITIALIZER_UNLOCKED;
+
 void IRAM_ATTR AUTODOORComponent::encoder_isr_handler(void *arg) {
   AUTODOORComponent *instance = (AUTODOORComponent *) arg;
   portENTER_CRITICAL_ISR(&timerMux);
@@ -56,12 +57,12 @@ void IRAM_ATTR AUTODOORComponent::encoder_isr_handler(void *arg) {
   instance->last_pulse_time = micros();
   portEXIT_CRITICAL_ISR(&timerMux);
 }
+void AUTODOORComponent::handle_encoder_pulse_wrapper(AUTODOORComponent *instance) { instance->handle_encoder_pulse(); }
 void AUTODOORComponent::handle_encoder_pulse() {
   portENTER_CRITICAL(&timerMux);
   if (pulse_count > 0) {
     unsigned long current_time = micros();
-    unsigned long interval = current_time - last_pulse_time;
-    rpm = (pulse_count * 60000000.0) / (interval * ENCODER_PULSES_PER_REVOLUTION);
+    rpm = (60000000.0 * pulse_count) / ((current_time - last_pulse_time) * ENCODER_PULSES_PER_REVOLUTION);
     pulse_count = 0;
   }
   portEXIT_CRITICAL(&timerMux);
@@ -102,23 +103,22 @@ void AUTODOORComponent::setup() {
   pinMode(dir_pin_, OUTPUT);
   pinMode(rotsen_pin_, INPUT_PULLUP);
 
+  // Configuração da interrupção do encoder
   if (digitalPinToInterrupt(rotsen_pin_) != NOT_AN_INTERRUPT) {
     attachInterruptArg(digitalPinToInterrupt(rotsen_pin_), encoder_isr_handler, this, RISING);
-  } else {
-    ESP_LOGE(TAG, "Pino do encoder não suporta interrupção!");
   }
 
-  // 3. Configuração do timer (modo mais robusto)
-  timer = timerBegin(0, 80, true);  // Timer 0, prescaler 80 (1MHz)
-  if (timer) {
-    timerAttachInterrupt(
-        timer, []() { static_cast<AUTODOORComponent *>(timerGetUserData(timer))->handle_encoder_pulse(); }, true);
-    timerAlarmWrite(timer, 1000000, true);  // 1 segundo
-    timerAlarmEnable(timer);
-    timerSetUserData(timer, this);
-  } else {
-    ESP_LOGE(TAG, "Falha ao inicializar timer!");
-  }
+  // Configuração do timer
+  timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(
+      timer,
+      []() {
+        AUTODOORComponent::handle_encoder_pulse_wrapper(static_cast<AUTODOORComponent *>(timerGetUserData(timer)));
+      },
+      true);
+  timerAlarmWrite(timer, 1000000, true);
+  timerAlarmEnable(timer);
+  timerSetUserData(timer, this);
 
   // Inicia Motores
   ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
