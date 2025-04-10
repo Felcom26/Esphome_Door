@@ -111,15 +111,12 @@ void AUTODOORComponent::dump_config() {
 }
 
 void AUTODOORComponent::loop() {
-  uint32_t start = millis();
   pot = analogRead(pot_pin_);
   ES_off = digitalRead(esoff_pin_);
   ES_on = digitalRead(eson_pin_);
 
   pos = map(pot, 4096, 0, 0, 270);
   ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
-
-  ESP_LOGD("auto_door", "Loop time: %u ms", millis() - start);
 
   if (cmd == 'e' && Estado_EM == false) {
     f_e = 1;
@@ -142,11 +139,12 @@ void AUTODOORComponent::loop() {
     cmd = 'n';
     busy = true;
   }
-
+  uint32_t start = millis();
   engate();
   desengate();
   abrir();
   fechar();
+  ESP_LOGD("auto_door", "Loop FUN: %u ms", millis() - start);
 
   if ((millis() - tempo) > 1000) {
     DEBUG_prints();
