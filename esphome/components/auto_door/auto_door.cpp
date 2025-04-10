@@ -50,9 +50,9 @@ const uint8_t PULSES_PER_ROTATION = 7;  // valor estimado, ajustar depois
 namespace esphome {
 namespace auto_door {
 
-void IRAM_ATTR encoder_isr()
+void IRAM_ATTR encoder_isr();
 
-    static const char *const TAG = "auto_door";
+static const char *const TAG = "auto_door";
 
 float AUTODOORComponent::get_setup_priority() const { return setup_priority::PROCESSOR; }
 
@@ -178,7 +178,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V69 rpm");
+  ESP_LOGI(TAG, "V69 rpm2");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
