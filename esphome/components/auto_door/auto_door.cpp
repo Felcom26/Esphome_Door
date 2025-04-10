@@ -161,7 +161,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V69 yeah");
+  ESP_LOGI(TAG, "V69 yeah2");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
@@ -271,7 +271,7 @@ void AUTODOORComponent::CMD_fechar() {
 
 void AUTODOORComponent::set_speed(float speed) {
   int pwm_speed = map(speed, 0, 100, 0, 255);
-  ledcWrite(chan_drive_pin_, pwm_speed);
+  // ledcWrite(chan_drive_pin_, pwm_speed);
   ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
 }
 
