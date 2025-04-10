@@ -43,9 +43,9 @@ float tempo;
 
 bool busy = false;
 
-const int pwmFreq = 1000;     // 1kHz
-const int pwmResolution = 8;  // 8 bits = valores de 0 a 255
-const int chan_drive_pin_ = 4;
+const int pwmFreq = 1000;       // 1kHz
+const int pwmResolution = 8;    // 8 bits = valores de 0 a 255
+const int chan_drive_pin_ = 4;  // Não usar 0
 
 namespace esphome {
 namespace auto_door {
@@ -100,7 +100,7 @@ void AUTODOORComponent::setup() {
 
   // Desliga Motores
   Engage.writeMicroseconds(stop_vel);
-  // ledcWrite(chan_drive_pin_, stop_vel_dm);
+  ledcWrite(chan_drive_pin_, stop_vel_dm);
   digitalWrite(dir_pin_, 0);
   delay(1000);
 
@@ -115,7 +115,7 @@ void AUTODOORComponent::setup() {
 }
 
 void AUTODOORComponent::dump_config() {
-  ESP_LOGCONFIG(TAG, "Auto Door:");
+  ESP_LOGCONFIG(TAG, "Auto Door V2:");
   ESP_LOGCONFIG(TAG, "  Angulo Aberto: %u", this->ang_open_);
   ESP_LOGCONFIG(TAG, "  Angulo Fechado: %u", this->ang_close_);
   LOG_UPDATE_INTERVAL(this);
@@ -172,7 +172,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V1");
+  ESP_LOGI(TAG, "V2");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
@@ -282,9 +282,9 @@ void AUTODOORComponent::CMD_fechar() {
 
 void AUTODOORComponent::set_speed(float speed) {
   int pwm_speed = map(speed, 0, 100, 0, 255);
-  ledcWrite(chan_drive_pin_, pwm_speed);
+  // ledcWrite(chan_drive_pin_, pwm_speed);
 
-  ESP_LOGD("SPEED", "Velocidade recebida: %.1f", pwm_speed);
+  ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
 }
 
 }  // namespace auto_door
