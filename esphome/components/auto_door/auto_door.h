@@ -7,6 +7,7 @@
 #include "esphome/core/gpio.h"
 #include "esphome/core/automation.h"
 #include "esphome/components/sensor/sensor.h"
+#include "driver/timer.h"
 //#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
