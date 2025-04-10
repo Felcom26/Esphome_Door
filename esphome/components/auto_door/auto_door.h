@@ -7,6 +7,7 @@
 #include "esphome/core/gpio.h"
 #include "esphome/core/automation.h"
 #include "esphome/components/sensor/sensor.h"
+#include "driver/timer.h"
 //#include "esphome/components/template/switch/template_switch.h"
 
 namespace esphome {
@@ -54,6 +55,9 @@ class AUTODOORComponent : public PollingComponent {
   void set_ang_open(uint8_t ang_open);
   void set_ang_close(uint8_t ang_close);
 
+  float get_motor_speed() const { return rpm; }
+  void handle_encoder_pulse();
+
  protected:
   auto_door_writer_t writer_;
   sensor::Sensor *position_sensor_{nullptr};
@@ -79,10 +83,15 @@ class AUTODOORComponent : public PollingComponent {
   volatile int pulse_count = 0;
   float rpm = 0.0;
   unsigned long last_pulse_time = 0;
+  static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme seu encoder
+
+  timer_group_t timer_group = TIMER_GROUP_0;
+  timer_idx_t timer_idx = TIMER_0;
+
   static void IRAM_ATTR encoder_isr_handler(void *arg);
   void handle_encoder_pulse();
+  static portMUX_TYPE timerMux;  // Para proteção das variáveis compartilhadas
   hw_timer_t *timer = nullptr;
-  static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme seu encod
 };
 
 }  // namespace auto_door
