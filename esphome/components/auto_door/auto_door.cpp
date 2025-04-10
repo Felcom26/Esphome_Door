@@ -42,6 +42,11 @@ const int pwmFreq = 1000;       // 1kHz
 const int pwmResolution = 8;    // 8 bits = valores de 0 a 255
 const int chan_drive_pin_ = 4;  // Não usar 0
 
+volatile uint32_t encoder_pulse_count = 0;
+unsigned long last_rpm_check = 0;
+float current_rpm = 0.0;
+const uint8_t PULSES_PER_ROTATION = 7;  // valor estimado, ajustar depois
+
 namespace esphome {
 namespace auto_door {
 
@@ -72,7 +77,7 @@ void AUTODOORComponent::set_position_sensor(sensor::Sensor *sensor) { this->posi
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
-  uint32_t start = millis();
+
   // Pinos de EndStop
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
@@ -80,7 +85,9 @@ void AUTODOORComponent::setup() {
   // Pinos Drive Motor
   pinMode(drive_pin_, OUTPUT);
   pinMode(dir_pin_, OUTPUT);
-  pinMode(rotsen_pin_, INPUT);
+  // pinMode(rotsen_pin_, INPUT);
+  pinMode(rotsen_pin_, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(rotsen_pin_), encoder_isr, RISING);
 
   // Inicia Motores
   ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
@@ -101,8 +108,9 @@ void AUTODOORComponent::setup() {
     Estado_EM = false;
 
   delay(500);
-  ESP_LOGD("auto_door", "Loop setup: %u ms", millis() - start);
 }
+
+void IRAM_ATTR encoder_isr() { encoder_pulse_count++; }
 
 void AUTODOORComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "Auto Door V2:");
@@ -118,6 +126,12 @@ void AUTODOORComponent::loop() {
 
   pos = map(pot, 4096, 0, 0, 270);
   ha_pos = map(pos, ang_close_, ang_open_, 0, 100);
+
+  static uint32_t last_log_time = 0;
+  if (millis() - last_log_time > 1000) {  // a cada 1 segundo
+    ESP_LOGI("auto_door", "Pulsos totais: %u", encoder_pulse_count);
+    last_log_time = millis();
+  }
 
   if (cmd == 'e' && Estado_EM == false) {
     f_e = 1;
