@@ -156,7 +156,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Flag F: %d", f_f);
   ESP_LOGD(TAG, "Flag E: %d", f_e);
   ESP_LOGD(TAG, "Flag D: %d", f_d);
-  // ESP_LOGD(TAG, "Estado_DM: %c", Estado_DM);
+  ESP_LOGD(TAG, "Estado_DM: %c", Estado_DM);
   ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
