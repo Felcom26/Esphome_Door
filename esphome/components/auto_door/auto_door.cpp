@@ -271,7 +271,7 @@ void AUTODOORComponent::CMD_fechar() {
 
 void AUTODOORComponent::set_speed(float speed) {
   int pwm_speed = map(speed, 0, 100, 0, 255);
-  // ledcWrite(chan_drive_pin_, pwm_speed);
+  ledcWrite(chan_drive_pin_, pwm_speed);
   ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
 }
 
