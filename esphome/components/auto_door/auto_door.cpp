@@ -45,7 +45,7 @@ const int chan_drive_pin_ = 4;  // Não usar 0
 volatile uint32_t encoder_pulse_count = 0;
 unsigned long last_rpm_check = 0;
 float rpm_ = 0.0;
-const uint8_t PULSES_PER_ROTATION = 1000;  // valor estimado, ajustar depois
+const float PULSES_PER_ROTATION = 1000;  // valor estimado, ajustar depois
 
 namespace esphome {
 namespace auto_door {
@@ -195,7 +195,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V69 rpm2");
+  ESP_LOGI(TAG, "V10 HA_RPM");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
