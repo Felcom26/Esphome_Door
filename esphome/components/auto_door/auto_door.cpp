@@ -161,7 +161,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V4");
+  ESP_LOGI(TAG, "V5");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
