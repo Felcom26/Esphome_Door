@@ -90,7 +90,7 @@ void AUTODOORComponent::setup() {
   // Desliga Motores
   Engage.writeMicroseconds(stop_vel);
   ledcWrite(chan_drive_pin_, stop_vel_dm);
-  digitalWrite(dir_pin_, LOW);
+  digitalWrite(dir_pin_, 0);
   delay(1000);
 
   // Desengata motor para iniciar
