@@ -75,6 +75,14 @@ class AUTODOORComponent : public PollingComponent {
 
   uint8_t ang_open_{238};
   uint8_t ang_close_{118};
+
+  volatile int pulse_count = 0;
+  float rpm = 0.0;
+  unsigned long last_pulse_time = 0;
+  static void IRAM_ATTR encoder_isr_handler(void *arg);
+  void handle_encoder_pulse();
+  hw_timer_t *timer = nullptr;
+  static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme seu encod
 };
 
 }  // namespace auto_door

@@ -4,6 +4,7 @@
 #include "esphome/core/hal.h"
 //#include "esphome/core/component.h"
 //#include "esphome/core/time.h"
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 Servo Engage;
 
@@ -47,6 +48,27 @@ namespace auto_door {
 
 static const char *const TAG = "auto_door";
 
+void IRAM_ATTR AUTODOORComponent::encoder_isr_handler(void *arg) {
+  AUTODOORComponent *instance = reinterpret_cast<AUTODOORComponent *>(arg);
+  portENTER_CRITICAL_ISR(&timerMux);
+  instance->pulse_count++;
+  portEXIT_CRITICAL_ISR(&timerMux);
+}
+void AUTODOORComponent::handle_encoder_pulse() {
+  portENTER_CRITICAL(&timerMux);
+  unsigned long current_time = micros();
+  unsigned long pulse_interval = current_time - last_pulse_time;
+  last_pulse_time = current_time;
+
+  if (pulse_interval > 0) {
+    // Cálculo de RPM: (1.000.000 µs/min) / (intervalo µs/pulse * pulsos/volta)
+    rpm = (60000000.0 / (pulse_interval * ENCODER_PULSES_PER_REVOLUTION));
+  }
+
+  pulse_count = 0;
+  portEXIT_CRITICAL(&timerMux);
+}
+
 float AUTODOORComponent::get_setup_priority() const { return setup_priority::PROCESSOR; }
 
 // void AUTODOORComponent::set_drive_pin(GPIOPin *drive_pin) {this->drive_pin_ = drive_pin; }
@@ -80,7 +102,16 @@ void AUTODOORComponent::setup() {
   // Pinos Drive Motor
   pinMode(drive_pin_, OUTPUT);
   pinMode(dir_pin_, OUTPUT);
-  pinMode(rotsen_pin_, INPUT);
+  pinMode(rotsen_pin_, INPUT_PULLUP);
+  attachInterruptArg(digitalPinToInterrupt(rotsen_pin_), encoder_isr_handler, this, RISING);
+
+  // Configura um timer para calcular RPM periodicamente
+  timer = timerBegin(0, 80, true);  // Timer 0, prescaler 80 (1MHz)
+  timerAttachInterrupt(
+      timer, [] { static_cast<AUTODOORComponent *>(timerGetTimerData(timer))->handle_encoder_pulse(); }, true);
+  timerAlarmWrite(timer, 1000000, true);  // 1 segundo
+  timerAlarmEnable(timer);
+  timerSetTimerData(timer, this);
 
   // Inicia Motores
   ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
@@ -152,6 +183,7 @@ void AUTODOORComponent::loop() {
 }
 
 void AUTODOORComponent::DEBUG_prints() {
+  ESP_LOGD(TAG, "Velocidade do motor: %.2f RPM", rpm);
   ESP_LOGD(TAG, "Flag A: %d", f_a);
   ESP_LOGD(TAG, "Flag F: %d", f_f);
   ESP_LOGD(TAG, "Flag E: %d", f_e);
@@ -161,7 +193,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
   ESP_LOGD(TAG, "ES_off: %d", ES_off);
-  ESP_LOGI(TAG, "V2");
+  ESP_LOGI(TAG, "V3");
   if (this->position_sensor_ != nullptr) {
     this->position_sensor_->publish_state(ha_pos);
   }
@@ -271,10 +303,11 @@ void AUTODOORComponent::CMD_fechar() {
 
 void AUTODOORComponent::set_speed(float speed) {
   int pwm_speed = map(speed, 0, 100, 0, 255);
-  // ledcWrite(chan_drive_pin_, pwm_speed);
-
+  ledcWrite(chan_drive_pin_, pwm_speed);
   ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
 }
+
+float AUTODOORComponent::get_motor_speed() const { return rpm; }
 
 }  // namespace auto_door
 }  // namespace esphome
