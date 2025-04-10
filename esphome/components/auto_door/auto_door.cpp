@@ -48,24 +48,25 @@ namespace auto_door {
 
 static const char *const TAG = "auto_door";
 
-portMUX_TYPE AUTODOORComponent::timerMux = portMUX_INITIALIZER_UNLOCKED;
+hw_timer_t *AUTODOORComponent::timer_ = nullptr;
+portMUX_TYPE AUTODOORComponent::timer_mux_ = portMUX_INITIALIZER_UNLOCKED;
 
 void IRAM_ATTR AUTODOORComponent::encoder_isr_handler(void *arg) {
   AUTODOORComponent *instance = (AUTODOORComponent *) arg;
-  portENTER_CRITICAL_ISR(&timerMux);
-  instance->pulse_count++;
-  instance->last_pulse_time = micros();
-  portEXIT_CRITICAL_ISR(&timerMux);
+  portENTER_CRITICAL_ISR(&timer_mux_);
+  instance->pulse_count_++;
+  instance->last_pulse_time_ = micros();
+  portEXIT_CRITICAL_ISR(&timer_mux_);
 }
-void AUTODOORComponent::handle_encoder_pulse_wrapper(AUTODOORComponent *instance) { instance->handle_encoder_pulse(); }
-void AUTODOORComponent::handle_encoder_pulse() {
-  portENTER_CRITICAL(&timerMux);
-  if (pulse_count > 0) {
+void AUTODOORComponent::handle_encoder_pulse(AUTODOORComponent *instance) {
+  portENTER_CRITICAL(&timer_mux_);
+  if (instance->pulse_count_ > 0) {
     unsigned long current_time = micros();
-    rpm = (60000000.0 * pulse_count) / ((current_time - last_pulse_time) * ENCODER_PULSES_PER_REVOLUTION);
-    pulse_count = 0;
+    instance->rpm_ = (60000000.0 * instance->pulse_count_) /
+                     ((current_time - instance->last_pulse_time_) * ENCODER_PULSES_PER_REVOLUTION);
+    instance->pulse_count_ = 0;
   }
-  portEXIT_CRITICAL(&timerMux);
+  portEXIT_CRITICAL(&timer_mux_);
 }
 
 float AUTODOORComponent::get_setup_priority() const { return setup_priority::PROCESSOR; }
@@ -109,16 +110,11 @@ void AUTODOORComponent::setup() {
   }
 
   // Configuração do timer
-  timer = timerBegin(0, 80, true);
+  timer_ = timerBegin(0, 80, true);
   timerAttachInterrupt(
-      timer,
-      []() {
-        AUTODOORComponent::handle_encoder_pulse_wrapper(static_cast<AUTODOORComponent *>(timerGetUserData(timer)));
-      },
-      true);
-  timerAlarmWrite(timer, 1000000, true);
-  timerAlarmEnable(timer);
-  timerSetUserData(timer, this);
+      timer_, []() { AUTODOORComponent::handle_encoder_pulse(this); }, true);
+  timerAlarmWrite(timer_, 1000000, true);
+  timerAlarmEnable(timer_);
 
   // Inicia Motores
   ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);

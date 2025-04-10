@@ -55,7 +55,7 @@ class AUTODOORComponent : public PollingComponent {
   void set_ang_open(uint8_t ang_open);
   void set_ang_close(uint8_t ang_close);
 
-  float get_motor_speed() const { return rpm; }
+  float get_motor_speed() const { return rpm_; }
   void handle_encoder_pulse();
 
  protected:
@@ -86,13 +86,12 @@ class AUTODOORComponent : public PollingComponent {
   static const int ENCODER_PULSES_PER_REVOLUTION = 20;  // Ajuste conforme necessário
 
   // Timer
-  hw_timer_t *timer = nullptr;
-  static void handle_encoder_pulse_wrapper(AUTODOORComponent *instance);
-  void handle_encoder_pulse();
+  static void handle_encoder_pulse(AUTODOORComponent *instance);
 
  private:
   static void IRAM_ATTR encoder_isr_handler(void *arg);
-  static portMUX_TYPE timerMux;
+  static hw_timer_t *timer_;
+  static portMUX_TYPE timer_mux_;
 };
 
 }  // namespace auto_door
