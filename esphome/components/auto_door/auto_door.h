@@ -16,13 +16,10 @@ namespace auto_door {
 
 class AUTODOORComponent : public PollingComponent {
  public:
-  // void set_writer(std::function<void()> &&writer);
-  // void set_writer(auto_door_writer_t &&writer);
-  // void set_writer(std::function<void()> &&writer);
-  void set_position_sensor(sensor::Sensor *sensor);
-
   using auto_door_writer_t = std::function<void(AUTODOORComponent &)>;
   void set_writer(auto_door_writer_t &&writer);
+
+  void set_position_sensor(sensor::Sensor *sensor);
 
   void update() override;
 
@@ -46,8 +43,6 @@ class AUTODOORComponent : public PollingComponent {
   void CMD_abrir();
   void CMD_fechar();
 
-  // Trigger<AUTODOORComponent *> *get_writer_trigger() { return &this->writer_; }
-
   // void set_drive_pin(GPIOPin *drive_pin);
   // void set_dir_pin(GPIOPin *dir_pin);
   // void set_rotsen_pin(GPIOPin *rotsen_pin);
@@ -60,7 +55,6 @@ class AUTODOORComponent : public PollingComponent {
   void set_ang_close(uint8_t ang_close);
 
  protected:
-  // std::function<void()> writer_;
   auto_door_writer_t writer_;
   sensor::Sensor *position_sensor_{nullptr};
   // GPIOPin *drive_pin_{nullptr};
@@ -81,10 +75,6 @@ class AUTODOORComponent : public PollingComponent {
 
   uint8_t ang_open_{238};
   uint8_t ang_close_{118};
-
-  // optional<auto_door_writer_t> writer_{};
-  // Trigger<AUTODOORComponent *> writer_;
-  // Trigger<AUTODOORComponent *> *writer_{nullptr};
 };
 
 }  // namespace auto_door

@@ -7,16 +7,12 @@
 
 Servo Engage;
 
-bool ES_off = false;
-bool ES_on = false;
-
 int f_e = 0;
 int f_d = 0;
 int f_a = 0;
 int f_f = 0;
 
-// bool cmd_e = 0;
-// bool cmd_d = 0;
+bool busy = false;
 
 char cmd = 'n';
 
@@ -26,8 +22,6 @@ char Estado_DM = 'n';
 int stop_vel = 1500;
 int max_vel = 1000;
 
-// int ang_aberto = 238;
-// int ang_fechado = 118;
 const int set_drive_vel = 255;
 const int set_engage_vel = 170;
 
@@ -35,13 +29,14 @@ const int stop_vel_dm = 255;
 int drive_vel_dm = stop_vel_dm - set_drive_vel;
 int engage_vel_dm = stop_vel_dm - set_engage_vel;
 
+bool ES_off = false;
+bool ES_on = false;
+
 int pot;
 int pos;
 int ha_pos;
 
 float tempo;
-
-bool busy = false;
 
 const int pwmFreq = 1000;       // 1kHz
 const int pwmResolution = 8;    // 8 bits = valores de 0 a 255
@@ -62,12 +57,6 @@ float AUTODOORComponent::get_setup_priority() const { return setup_priority::PRO
 // void AUTODOORComponent::set_esoff_pin(GPIOPin *esoff_pin) {this->esoff_pin_ = esoff_pin; }
 // void AUTODOORComponent::set_eson_pin(GPIOPin *eson_pin) {this->eson_pin_ = eson_pin; }
 
-// void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
-// void AUTODOORComponent::set_writer(Trigger<AUTODOORComponent *> *t) {
-//   this->writer_ = t;
-// }
-
-// void AUTODOORComponent::set_writer(std::function<void()> &&writer) { this->writer_ = writer; }
 void AUTODOORComponent::set_writer(auto_door_writer_t &&writer) { this->writer_ = writer; }
 
 void AUTODOORComponent::update() {
@@ -167,7 +156,7 @@ void AUTODOORComponent::DEBUG_prints() {
   ESP_LOGD(TAG, "Flag F: %d", f_f);
   ESP_LOGD(TAG, "Flag E: %d", f_e);
   ESP_LOGD(TAG, "Flag D: %d", f_d);
-  // ESP_LOGD(TAG, "Estado_DM: %s", Estado_DM);
+  ESP_LOGD(TAG, "Estado_DM: %s", Estado_DM);
   ESP_LOGD(TAG, "Estado_EM: %d", Estado_EM);
   ESP_LOGD(TAG, "Posição do sensor: %d", pos);
   ESP_LOGD(TAG, "ES_on: %d", ES_on);
