@@ -4,7 +4,8 @@
 #include "esphome/core/hal.h"
 //#include "esphome/core/component.h"
 //#include "esphome/core/time.h"
-portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+// portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE AUTODOORComponent::timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 Servo Engage;
 
@@ -49,23 +50,20 @@ namespace auto_door {
 static const char *const TAG = "auto_door";
 
 void IRAM_ATTR AUTODOORComponent::encoder_isr_handler(void *arg) {
-  AUTODOORComponent *instance = reinterpret_cast<AUTODOORComponent *>(arg);
+  AUTODOORComponent *instance = (AUTODOORComponent *) arg;
   portENTER_CRITICAL_ISR(&timerMux);
   instance->pulse_count++;
+  instance->last_pulse_time = micros();
   portEXIT_CRITICAL_ISR(&timerMux);
 }
 void AUTODOORComponent::handle_encoder_pulse() {
   portENTER_CRITICAL(&timerMux);
-  unsigned long current_time = micros();
-  unsigned long pulse_interval = current_time - last_pulse_time;
-  last_pulse_time = current_time;
-
-  if (pulse_interval > 0) {
-    // Cálculo de RPM: (1.000.000 µs/min) / (intervalo µs/pulse * pulsos/volta)
-    rpm = (60000000.0 / (pulse_interval * ENCODER_PULSES_PER_REVOLUTION));
+  if (pulse_count > 0) {
+    unsigned long current_time = micros();
+    unsigned long interval = current_time - last_pulse_time;
+    rpm = (pulse_count * 60000000.0) / (interval * ENCODER_PULSES_PER_REVOLUTION);
+    pulse_count = 0;
   }
-
-  pulse_count = 0;
   portEXIT_CRITICAL(&timerMux);
 }
 
@@ -103,15 +101,24 @@ void AUTODOORComponent::setup() {
   pinMode(drive_pin_, OUTPUT);
   pinMode(dir_pin_, OUTPUT);
   pinMode(rotsen_pin_, INPUT_PULLUP);
-  attachInterruptArg(digitalPinToInterrupt(rotsen_pin_), encoder_isr_handler, this, RISING);
 
-  // Configura um timer para calcular RPM periodicamente
+  if (digitalPinToInterrupt(rotsen_pin_) != NOT_AN_INTERRUPT) {
+    attachInterruptArg(digitalPinToInterrupt(rotsen_pin_), encoder_isr_handler, this, RISING);
+  } else {
+    ESP_LOGE(TAG, "Pino do encoder não suporta interrupção!");
+  }
+
+  // 3. Configuração do timer (modo mais robusto)
   timer = timerBegin(0, 80, true);  // Timer 0, prescaler 80 (1MHz)
-  timerAttachInterrupt(
-      timer, [] { static_cast<AUTODOORComponent *>(timerGetTimerData(timer))->handle_encoder_pulse(); }, true);
-  timerAlarmWrite(timer, 1000000, true);  // 1 segundo
-  timerAlarmEnable(timer);
-  timerSetTimerData(timer, this);
+  if (timer) {
+    timerAttachInterrupt(
+        timer, []() { static_cast<AUTODOORComponent *>(timerGetUserData(timer))->handle_encoder_pulse(); }, true);
+    timerAlarmWrite(timer, 1000000, true);  // 1 segundo
+    timerAlarmEnable(timer);
+    timerSetUserData(timer, this);
+  } else {
+    ESP_LOGE(TAG, "Falha ao inicializar timer!");
+  }
 
   // Inicia Motores
   ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
@@ -121,7 +128,7 @@ void AUTODOORComponent::setup() {
   // Desliga Motores
   Engage.writeMicroseconds(stop_vel);
   ledcWrite(chan_drive_pin_, stop_vel_dm);
-  digitalWrite(dir_pin_, 0);
+  digitalWrite(dir_pin_, LOW);
   delay(1000);
 
   // Desengata motor para iniciar
