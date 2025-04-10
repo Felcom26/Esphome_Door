@@ -72,7 +72,7 @@ void AUTODOORComponent::set_position_sensor(sensor::Sensor *sensor) { this->posi
 
 void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
-
+  uint32_t start = millis();
   // Pinos de EndStop
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
@@ -101,6 +101,7 @@ void AUTODOORComponent::setup() {
     Estado_EM = false;
 
   delay(500);
+  ESP_LOGD("auto_door", "Loop setup: %u ms", millis() - start);
 }
 
 void AUTODOORComponent::dump_config() {
@@ -139,12 +140,11 @@ void AUTODOORComponent::loop() {
     cmd = 'n';
     busy = true;
   }
-  uint32_t start = millis();
+
   engate();
   desengate();
   abrir();
   fechar();
-  ESP_LOGD("auto_door", "Loop FUN: %u ms", millis() - start);
 
   if ((millis() - tempo) > 1000) {
     DEBUG_prints();
