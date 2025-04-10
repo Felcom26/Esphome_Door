@@ -37,6 +37,7 @@ int pos;
 int ha_pos;
 
 float tempo;
+float tempo_rpm;
 
 bool debug_sw_ = false;
 bool div2 = false;
@@ -140,19 +141,28 @@ void AUTODOORComponent::loop() {
   // encoder_pulse_count = 0;
   // rpm_ = (pulses * 60.0f) / 1000.0f;  // 1000 = pulsos por rotação
 
-  static uint32_t last_time = 0;
-  uint32_t now = millis();
-  uint32_t elapsed_ms = now - last_time;
-  last_time = now;
+  ////////////////////////////////////////////////////////////////////////////
 
-  uint32_t pulses = encoder_pulse_count;
-  encoder_pulse_count = 0;
+  // static uint32_t last_time = 0;
+  // uint32_t now = millis();
+  // uint32_t elapsed_ms = now - last_time;
+  // last_time = now;
+
+  // uint32_t pulses = encoder_pulse_count;
+  // encoder_pulse_count = 0;
 
   // elapsed_ms em milissegundos → converter para minutos
-  float elapsed_minutes = elapsed_ms / 60000.0f;
+  // float elapsed_minutes = elapsed_ms / 60000.0f;
 
-  if (elapsed_minutes > 0) {
-    rpm_ = (pulses / PULSES_PER_ROTATION) / elapsed_minutes;  // pulsos por rotação = 1000
+  // if (elapsed_minutes > 0) {
+  //   rpm_ = (pulses / PULSES_PER_ROTATION) / elapsed_minutes;  // pulsos por rotação = 1000
+  // }
+
+  if ((millis() - tempo_rpm) > 1000) {
+    uint32_t pulses = encoder_pulse_count;
+    encoder_pulse_count = 0;
+    rpm_ = (pulses / PULSES_PER_ROTATION) * 60;
+    tempo = millis();
   }
 
   if (cmd == 'e' && Estado_EM == false) {
@@ -199,7 +209,7 @@ void AUTODOORComponent::DEBUG_prints() {
     ESP_LOGD(TAG, "Posição do sensor: %d", pos);
     ESP_LOGD(TAG, "ES_on: %d", ES_on);
     ESP_LOGD(TAG, "ES_off: %d", ES_off);
-    ESP_LOGI(TAG, "V10 HA_RPM");
+    ESP_LOGI(TAG, "V11 HA_RPM");
     div2 = false;
   } else {
     div2 = true;
