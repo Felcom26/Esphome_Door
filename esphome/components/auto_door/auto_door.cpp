@@ -97,13 +97,15 @@ void AUTODOORComponent::setup() {
   attachInterrupt(digitalPinToInterrupt(rotsen_pin_), encoder_isr, RISING);
 
   // Inicia Motores
-  ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
-  ledcAttachPin(drive_pin_, chan_drive_pin_);
+  //ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
+  //ledcAttachPin(drive_pin_, chan_drive_pin_);
+  ledcAttach(drive_pin_, pwmFreq, pwmResolution);
   Engage.attach(engage_pin_);
 
   // Desliga Motores
   Engage.writeMicroseconds(stop_vel);
-  ledcWrite(chan_drive_pin_, stop_vel_dm);
+  //ledcWrite(chan_drive_pin_, stop_vel_dm);
+  ledcWrite(drive_pin_, stop_vel_dm);
   digitalWrite(dir_pin_, 0);
   delay(1000);
 
@@ -257,14 +259,16 @@ void AUTODOORComponent::abrir() {
   if (f_a == 1) {
     cmd = 'e';
     f_a = 2;
-    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    //ledcWrite(chan_drive_pin_, engage_vel_dm);
+    ledcWrite(drive_pin_, engage_vel_dm);
     // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 1);
   }
 
   else if (f_a == 2 && Estado_EM == true) {
     f_a = 3;
-    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    //ledcWrite(chan_drive_pin_, drive_vel_dm);
+    ledcWrite(drive_pin_, drive_vel_dm);
     // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 1);
     ESP_LOGI(TAG, "Abrindo");
@@ -272,7 +276,8 @@ void AUTODOORComponent::abrir() {
 
   else if (pos >= ang_open_ && f_a == 3) {
     f_a = 4;
-    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    //ledcWrite(chan_drive_pin_, stop_vel_dm);
+    ledcWrite(drive_pin_, stop_vel_dm);
     // digitalWrite(drive_pin_, 1);
     ESP_LOGI(TAG, "Aberto");
   }
@@ -288,14 +293,16 @@ void AUTODOORComponent::fechar() {
   if (f_f == 1) {
     cmd = 'e';
     f_f = 2;
-    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    //ledcWrite(chan_drive_pin_, engage_vel_dm);
+    ledcWrite(drive_pin_, engage_vel_dm);
     // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 0);
   }
 
   else if (f_f == 2 && Estado_EM == true) {
     f_f = 3;
-    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    //ledcWrite(chan_drive_pin_, drive_vel_dm);
+    ledcWrite(drive_pin_, drive_vel_dm);
     // digitalWrite(drive_pin_, 0);
     digitalWrite(dir_pin_, 0);
     ESP_LOGI(TAG, "fechando");
@@ -303,7 +310,8 @@ void AUTODOORComponent::fechar() {
 
   else if (pos <= ang_close_ && f_f == 3) {
     f_f = 4;
-    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    //ledcWrite(chan_drive_pin_, stop_vel_dm);
+    ledcWrite(drive_pin_, stop_vel_dm);
     // digitalWrite(drive_pin_, 1);
     ESP_LOGI(TAG, "fechado");
   }
@@ -332,7 +340,8 @@ void AUTODOORComponent::set_debug_mode(bool debug_sw) { debug_sw_ = debug_sw; }
 void AUTODOORComponent::set_speed(float speed) {
   if (debug_sw_ == true) {
     int pwm_speed = map(speed, 0, 100, 0, 255);
-    ledcWrite(chan_drive_pin_, pwm_speed);
+    //ledcWrite(chan_drive_pin_, pwm_speed);
+    ledcWrite(drive_pin_, pwm_speed);
     ESP_LOGD("SPEED", "Velocidade recebida: %d", pwm_speed);
   }
 }
