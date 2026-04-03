@@ -82,8 +82,9 @@ void AUTODOORComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Auto_Door...");
   // Serial.begin(9600);
 
-  ledcAttachPin(drive_pin_, chan_drive_pin_);
-  ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
+  //ledcAttachPin(drive_pin_, chan_drive_pin_);
+  //ledcSetup(chan_drive_pin_, pwmFreq, pwmResolution);
+  ledcAttach(drive_pin_, pwmFreq, pwmResolution);
 
   pinMode(esoff_pin_, INPUT_PULLUP);
   pinMode(eson_pin_, INPUT_PULLUP);
@@ -96,7 +97,8 @@ void AUTODOORComponent::setup() {
   Engage.writeMicroseconds(stop_vel);
   delay(1000);
 
-  ledcWrite(chan_drive_pin_, stop_vel_dm);
+  //ledcWrite(chan_drive_pin_, stop_vel_dm);
+  ledcWrite(drive_pin_, stop_vel_dm);
   // analogWrite(drive_pin_, stop_vel_dm);
   digitalWrite(dir_pin_, 0);
 
@@ -235,14 +237,16 @@ void AUTODOORComponent::abrir() {
   if (f_a == 1) {
     cmd = 'e';
     f_a = 2;
-    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    //ledcWrite(chan_drive_pin_, engage_vel_dm);
+    ledcWrite(drive_pin_, engage_vel_dm);
     // analogWrite(drive_pin_, engage_vel_dm);
     digitalWrite(dir_pin_, 1);
   }
 
   else if (f_a == 2 && Estado_EM == true) {
     f_a = 3;
-    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    //ledcWrite(chan_drive_pin_, drive_vel_dm);
+    ledcWrite(drive_pin_, drive_vel_dm);
     // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 1);
     // Serial.println("abrindo");
@@ -251,7 +255,8 @@ void AUTODOORComponent::abrir() {
 
   else if (pos >= ang_open_ && f_a == 3) {
     f_a = 4;
-    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    //ledcWrite(chan_drive_pin_, stop_vel_dm);
+    ledcWrite(drive_pin_, stop_vel_dm)
     // analogWrite(drive_pin_, stop_vel_dm);
     //  Serial.println("aberto");
     ESP_LOGI(TAG, "Aberto");
@@ -268,14 +273,16 @@ void AUTODOORComponent::fechar() {
   if (f_f == 1) {
     cmd = 'e';
     f_f = 2;
-    ledcWrite(chan_drive_pin_, engage_vel_dm);
+    //ledcWrite(chan_drive_pin_, engage_vel_dm);
+    ledcWrite(drive_pin_, engage_vel_dm);
     // analogWrite(drive_pin_, engage_vel_dm);
     digitalWrite(dir_pin_, 0);
   }
 
   else if (f_f == 2 && Estado_EM == true) {
     f_f = 3;
-    ledcWrite(chan_drive_pin_, drive_vel_dm);
+    //ledcWrite(chan_drive_pin_, drive_vel_dm);
+    ledcWrite(drive_pin_, drive_vel_dm);
     // analogWrite(drive_pin_, drive_vel_dm);
     digitalWrite(dir_pin_, 0);
     // Serial.println("fechando");
@@ -284,7 +291,8 @@ void AUTODOORComponent::fechar() {
 
   else if (pos <= ang_close_ && f_f == 3) {
     f_f = 4;
-    ledcWrite(chan_drive_pin_, stop_vel_dm);
+    //ledcWrite(chan_drive_pin_, stop_vel_dm);
+    ledcWrite(drive_pin_, stop_vel_dm);
     // analogWrite(drive_pin_, stop_vel_dm);
     //  Serial.println("fechado");
     ESP_LOGI(TAG, "fechado");
